@@ -4,13 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to Transparent SVG Converter</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #svgcontainer img {
+            max-width: 100%;
+            height: auto;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Image to Transparent SVG Converter</h1>
-    <input type="text" id="imageUrl" placeholder="Enter Image URL">
-    <button onclick="convertImage()">Convert Image</button>
-    <div id="svgcontainer"></div>
+    <div class="container">
+        <h1>Image to Transparent SVG Converter</h1>
+        <input type="text" id="imageUrl" placeholder="Enter Image URL">
+        <button onclick="convertImage()">Convert Image</button>
+        <div id="svgcontainer"></div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        async function convertImage() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            try {
+                const response = await fetch(imageUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const blob = await response.blob();
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(blob);
+                img.onload = () => {
+                    ImageTracer.imageToSVG(img, svgString => {
+                        document.getElementById('svgcontainer').innerHTML = svgString;
+                    });
+                };
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+    </script>
 </body>
 </html>
+
